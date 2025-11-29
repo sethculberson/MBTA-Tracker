@@ -56,6 +56,7 @@ export default function Home() {
   const [line, setLine] = useState<Route>(redLine);
   const [stop, setStop] = useState<Stop>(initialStops[0]);
   const [allStops, setAllStops] = useState([] as Stop[]);
+  const [direction, setDirection] = useState<number>(0);
 
   async function handleLineSelection(l : Route) {
     setLine(l);
@@ -67,7 +68,7 @@ export default function Home() {
     if (!line) return;
     if (!stop) return;
 
-    let preds = await getPredictions(line, stop);
+    let preds = await getPredictions(line, stop, direction);
     setPredictions(preds);
   }
 
@@ -80,6 +81,13 @@ export default function Home() {
       <div className="text-center m-4 border border-gray-300 p-4 rounded-lg shadow">
         <LineSelector line={line ? line : redLine} setLine={handleLineSelection} />
         {allStops.length > 0 && stop && <StopSelector stop={stop} setStop={setStop} stopsData={allStops} ></StopSelector>}
+        {line && <select className="text-center p-4 w-full" id="direction-selector" name="directions" onChange={(e) => setDirection(parseInt(e.target.value))} value={direction}>
+            {line.attributes.direction_names.map((dirName, index) => (
+                <option key={index} value={index}>
+                    {dirName}
+                </option>
+            ))}
+        </select>}
         <button className="m-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-150" onClick={handleButton}>Get Trains</button>
       </div>
       <PredictionsDisplay predictions={predictions} />
