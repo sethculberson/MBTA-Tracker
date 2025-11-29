@@ -7,7 +7,7 @@ export default function LineSelector({line, setLine}: {line: string, setLine: (l
         <select className="text-center p-4 w-full" id="line-selector" name="lines" onChange={(e) => setLine(e.target.value)} value={line}>
             {linesData.map((line) => (
                 <option key={line.id} value={line.id}>
-                    {line.attributes.long_name}
+                    {line.id}
                 </option>
             ))}
         </select>

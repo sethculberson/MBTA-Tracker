@@ -10,6 +10,31 @@ export type Prediction = {
     type : string,
 }
 
+export type Stop = {
+    attributes : StopAttributes,
+    id : string,
+    relationships : {
+        parent_station : Data | null,
+        zone : Data | null,
+        child_stops : Data[] | null,
+        routes : Data[] | null,
+        facilities : Data[] | null,
+    },
+    type : string,
+}
+
+type StopAttributes = {
+    address? : string,
+    description? : string,
+    latitude : number,
+    longitude : number,
+    municipality? : string,
+    name : string,
+    platform_code? : string,
+    platform_name? : string,
+    wheelchair_boarding : number,
+}
+
 type PredictionAttributes = {
     arrival_time? : string,
     arrival_uncertainty? : number,
