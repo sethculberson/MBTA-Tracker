@@ -9,6 +9,7 @@ export default function PredictionsDisplay({predictions}: {predictions: Predicti
             hour: 'numeric',
             minute: '2-digit',
             hour12: true,
+            timeZone: 'America/New_York',
             timeZoneName: 'short', 
         };
 
@@ -16,7 +17,7 @@ export default function PredictionsDisplay({predictions}: {predictions: Predicti
     }
 
     return (
-        <ul className="columns-2 gap-4 mt-4">
+        <ul className="flex flex-col gap-4 mt-4">
             {predictions.length > 0 && predictions.map((item) => 
             item.attributes.departure_time && 
             <li key={item.id} className="text-lg text-blue-500 border border-gray-300 m-2 p-4 rounded-lg shadow">

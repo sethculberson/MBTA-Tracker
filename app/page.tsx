@@ -55,7 +55,7 @@ export default function Home() {
   const [predictions, setPredictions] = useState([] as Prediction[]);
   const [line, setLine] = useState<Route>(redLine);
   const [stop, setStop] = useState<Stop>(initialStops[0]);
-  const [allStops, setAllStops] = useState([] as Stop[]);
+  const [allStops, setAllStops] = useState(initialStops);
   const [direction, setDirection] = useState<number>(0);
 
   async function handleLineSelection(l : Route) {
@@ -72,23 +72,25 @@ export default function Home() {
     setPredictions(preds);
   }
 
-  useEffect(() => {
-    handleLineSelection(redLine);
-  }, []);
   return (
     <div>
       <h1 className="text-center text-4xl font-bold m-8">Welcome to the MBTA Monitoring App</h1>
       <div className="text-center m-4 border border-gray-300 p-4 rounded-lg shadow">
+        <p className="inline m-4">Line: </p>
         <LineSelector line={line ? line : redLine} setLine={handleLineSelection} />
+        <p className="inline m-4">Stop: </p>
         {allStops.length > 0 && stop && <StopSelector stop={stop} setStop={setStop} stopsData={allStops} ></StopSelector>}
-        {line && <select className="text-center p-4 w-full" id="direction-selector" name="directions" onChange={(e) => setDirection(parseInt(e.target.value))} value={direction}>
-            {line.attributes.direction_names.map((dirName, index) => (
-                <option key={index} value={index}>
-                    {dirName}
-                </option>
-            ))}
-        </select>}
-        <button className="m-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-150" onClick={handleButton}>Get Trains</button>
+        <div className="block m-auto p-4">
+          <p className="inline m-4">Direction: </p>
+          {line && <select className="inline text-center p-2 w-auto border border-black rounded-lg hover:border-blue-500 transition duration-100" id="direction-selector" name="directions" onChange={(e) => setDirection(parseInt(e.target.value))} value={direction}>
+              {line.attributes.direction_names.map((dirName, index) => (
+                  <option key={index} value={index}>
+                      {dirName}
+                  </option>
+             ))}
+          </select>}
+        </div>
+        <button className="m-auto block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-150" onClick={handleButton}>Get Trains</button>
       </div>
       <PredictionsDisplay predictions={predictions} />
     </div>
