@@ -1,6 +1,6 @@
 "use client";
 import { getPredictions } from "@/lib/getPredictions";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Prediction, Stop, Route } from "@/types/types";
 import LineSelector from "./components/LineSelector";
 import PredictionsDisplay from "./components/PredictionsDisplay";
@@ -49,7 +49,7 @@ export default function Home() {
     },
     "type": "route"
   };
-
+  
   const initialStops : Stop[] = redLineStops['data'];
 
   const [predictions, setPredictions] = useState([] as Prediction[]);
@@ -57,32 +57,46 @@ export default function Home() {
   const [stop, setStop] = useState<Stop>(initialStops[0]);
   const [allStops, setAllStops] = useState(initialStops);
   const [direction, setDirection] = useState<number>(0);
+  const [isError, setIsError] = useState<boolean>(false);
 
   async function handleLineSelection(l : Route) {
     setLine(l);
-    let s = await getStops(l.id);
-    setAllStops(s);
+    await getStops(l.id)
+      .then(s => setAllStops(s))
+      .catch((err) => {
+        console.error("Failed to set all stops.", err);
+        setIsError(true);
+      });
   }
 
   async function handleButton(){
     if (!line) return;
     if (!stop) return;
 
-    let preds = await getPredictions(line, stop, direction);
-    setPredictions(preds);
+    await getPredictions(line, stop, direction)
+      .then((preds) => {
+        console.log("Setting predictions:", preds);
+        setPredictions(preds);
+      })
+      .catch((err) => {
+        console.error("Failed to set predictions.", err)
+        setIsError(true);
+      });
   }
 
+  const labelStyle = "inline m-4 font-light text-[calc(1vw+12px)] text-white"
+
   return (
-    <div>
-      <h1 className="text-center text-4xl font-bold m-8">Welcome to the MBTA Monitoring App</h1>
-      <div className="text-center m-4 border border-gray-300 p-4 rounded-lg shadow">
-        <p className="inline m-4">Line: </p>
+    <div className="">
+      <h1 className="text-center text-[8vw] font-medium p-4 mb-8 bg-teal-900 text-white shadow">MBTA Tracker</h1>
+      <div className="text-center m-auto border-2 border-white p-4 rounded-lg shadow max-w-[70vw]">
+        <p className={labelStyle}>Line: </p>
         <LineSelector line={line ? line : redLine} setLine={handleLineSelection} />
-        <p className="inline m-4">Stop: </p>
+        <p className={labelStyle}>Stop: </p>
         {allStops.length > 0 && stop && <StopSelector stop={stop} setStop={setStop} stopsData={allStops} ></StopSelector>}
         <div className="block m-auto p-4">
-          <p className="inline m-4">Direction: </p>
-          {line && <select className="inline text-center p-2 w-auto border border-black rounded-lg hover:border-blue-500 transition duration-100" id="direction-selector" name="directions" onChange={(e) => setDirection(parseInt(e.target.value))} value={direction}>
+          <p className={labelStyle}>Direction: </p>
+          {line && <select className="inline text-center p-2 w-auto border border-white text-white rounded-lg hover:border-orange-500 hover:text-orange-500 transition duration-100" id="direction-selector" name="directions" onChange={(e) => setDirection(parseInt(e.target.value))} value={direction}>
               {line.attributes.direction_names.map((dirName, index) => (
                   <option key={index} value={index}>
                       {dirName}
@@ -90,8 +104,9 @@ export default function Home() {
              ))}
           </select>}
         </div>
-        <button className="m-auto block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-150" onClick={handleButton}>Get Trains</button>
+        <button className="m-auto block bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-500 transition duration-150" onClick={handleButton}>Get Trains</button>
       </div>
+      {isError && <h4 className="text-xl text-white text-center p-8">Error fetching results</h4>}
       <PredictionsDisplay predictions={predictions} />
     </div>
   );
