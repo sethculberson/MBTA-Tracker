@@ -7,6 +7,7 @@ import PredictionsDisplay from "./components/PredictionsDisplay";
 import { getStops } from "@/lib/getStops";
 import StopSelector from "./components/StopSelector";
 import redLineStops from "@/data/redLineStops.json";
+import { init } from "next/dist/compiled/webpack/webpack";
 
 export default function Home() {
   const redLine : Route = {
@@ -54,27 +55,34 @@ export default function Home() {
 
   const [predictions, setPredictions] = useState([] as Prediction[]);
 
-  const [line, setLine] = useState<Route>(() => {
-    const savedLine = localStorage.getItem('cachedLine');
-    return savedLine ? JSON.parse(savedLine) : redLine;
-  });
+  const [line, setLine] = useState<Route>(redLine);
 
-  const [stop, setStop] = useState<Stop>(() => {
-    const savedStop = localStorage.getItem('cachedStop');
-    return savedStop ? JSON.parse(savedStop) : initialStops[0];
-  });
+  const [stop, setStop] = useState<Stop>(initialStops[0]);
 
-  const [allStops, setAllStops] = useState<Stop[]>(() => {
-    const savedStops = localStorage.getItem('cachedStops');
-    return savedStops ? JSON.parse(savedStops) : initialStops;
-  });
+  const [allStops, setAllStops] = useState<Stop[]>(initialStops);
 
-  const [direction, setDirection] = useState<number>(() => {
-    const savedDirection = localStorage.getItem('cachedDirection');
-    return savedDirection ? JSON.parse(savedDirection) : 0;
-  });
+  const [direction, setDirection] = useState<number>(0);
 
   const [isError, setIsError] = useState<boolean>(false);
+
+  useEffect(() => {
+    const storedLine = localStorage.getItem('cachedLine');
+    if (storedLine) {
+      setLine(JSON.parse(storedLine));
+    }
+    const storedStop = localStorage.getItem('cachedStop');
+    if (storedStop) {
+      setStop(JSON.parse(storedStop));
+    }
+    const storedStops = localStorage.getItem('cachedStops');
+    if (storedStops) {
+      setAllStops(JSON.parse(storedStops));
+    }
+    const storedDirection = localStorage.getItem('cachedDirection');
+    if (storedDirection) {
+      setDirection(JSON.parse(storedDirection));
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('cachedLine', JSON.stringify(line));
