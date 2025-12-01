@@ -55,7 +55,7 @@ export default function Home() {
   const [predictions, setPredictions] = useState([] as Prediction[]);
   const [line, setLine] = useState<Route>(redLine);
   const [stop, setStop] = useState<Stop>(initialStops[0]);
-  const [allStops, setAllStops] = useState(initialStops);
+  const [allStops, setAllStops] = useState<Stop[]>(initialStops);
   const [direction, setDirection] = useState<number>(0);
   const [isError, setIsError] = useState<boolean>(false);
 
