@@ -1,6 +1,6 @@
 "use client";
 import { getPredictions } from "@/lib/getPredictions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Prediction, Stop, Route } from "@/types/types";
 import LineSelector from "./components/LineSelector";
 import PredictionsDisplay from "./components/PredictionsDisplay";
@@ -53,11 +53,35 @@ export default function Home() {
   const initialStops : Stop[] = redLineStops['data'];
 
   const [predictions, setPredictions] = useState([] as Prediction[]);
-  const [line, setLine] = useState<Route>(redLine);
-  const [stop, setStop] = useState<Stop>(initialStops[0]);
-  const [allStops, setAllStops] = useState<Stop[]>(initialStops);
-  const [direction, setDirection] = useState<number>(0);
+
+  const [line, setLine] = useState<Route>(() => {
+    const savedLine = localStorage.getItem('cachedLine');
+    return savedLine ? JSON.parse(savedLine) : redLine;
+  });
+
+  const [stop, setStop] = useState<Stop>(() => {
+    const savedStop = localStorage.getItem('cachedStop');
+    return savedStop ? JSON.parse(savedStop) : initialStops[0];
+  });
+
+  const [allStops, setAllStops] = useState<Stop[]>(() => {
+    const savedStops = localStorage.getItem('cachedStops');
+    return savedStops ? JSON.parse(savedStops) : initialStops;
+  });
+
+  const [direction, setDirection] = useState<number>(() => {
+    const savedDirection = localStorage.getItem('cachedDirection');
+    return savedDirection ? JSON.parse(savedDirection) : 0;
+  });
+
   const [isError, setIsError] = useState<boolean>(false);
+
+  useEffect(() => {
+    localStorage.setItem('cachedLine', JSON.stringify(line));
+    localStorage.setItem('cachedStop', JSON.stringify(stop));
+    localStorage.setItem('cachedStops', JSON.stringify(allStops));
+    localStorage.setItem('cachedDirection', JSON.stringify(direction));
+  }, [line, stop, allStops, direction]);
 
   async function handleLineSelection(l : Route) {
     setLine(l);
